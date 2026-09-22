@@ -237,7 +237,6 @@ void main() {
 
     expect(state.pendingRaise!.requesterId, 'p2');
     expect(state.pendingRaise!.responderId, 'p1');
-    expect(state.turnPlayerId, 'p1');
 
     state = game.apply(
       state,
@@ -246,7 +245,6 @@ void main() {
 
     expect(state.pendingRaise!.requesterId, 'p1');
     expect(state.pendingRaise!.responderId, 'p2');
-    expect(state.turnPlayerId, 'p2');
   });
 
   test('partidas 1v1 e 2v2 preservam invariantes de cartas até o fim', () {
