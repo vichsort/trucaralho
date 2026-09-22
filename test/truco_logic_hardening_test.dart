@@ -101,8 +101,30 @@ void _playToTerminal(
     );
     final ai = ais[playerId];
 
-    expect(ai, isNotNull);
-    state = game.apply(state, ai!.chooseAction(state, player));
+    expect(
+      ai,
+      isNotNull,
+      reason: 'IA ausente para $playerId na fase ${state.phase.name}.',
+    );
+    final hand = state.hands[playerId];
+    expect(
+      hand,
+      isNotEmpty,
+      reason:
+          'IA sem cartas: player=$playerId phase=${state.phase.name} '
+          'trick=${state.currentTrick} scores=${state.teamScores} '
+          'hands=${state.hands}',
+    );
+
+    try {
+      state = game.apply(state, ai!.chooseAction(state, player));
+    } on Object catch (error) {
+      fail(
+        'Ação inválida no estresse: player=$playerId '
+        'phase=${state.phase.name} turn=${state.turnPlayerId} '
+        'pending=${state.pendingRaise} error=$error',
+      );
+    }
   }
 
   fail('A partida excedeu o limite de $maxActions ações.');
