@@ -181,7 +181,10 @@ void main() {
 
   test('IA decide Mão de Onze automaticamente', () async {
     final s = session(
-      state: baseState(scores: const {'t1': 8, 't2': 11}),
+      state: baseState(scores: const {'t1': 8, 't2': 11}).copyWith(
+        phase: TrucoPhase.waitingElevenDecision,
+        handElevenTeamId: 't2',
+      ),
       ais: {
         'p2': FixedAI(
           (state, player) => AcceptEleven(player.id),
