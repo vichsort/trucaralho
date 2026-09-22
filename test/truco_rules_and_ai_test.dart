@@ -185,12 +185,12 @@ void main() {
 
     for (final play in [
       const PlayCard(
-        playerId: 'p1',
-        card: Card(rank: Rank.four, suit: Suit.diamonds),
-      ),
-      const PlayCard(
         playerId: 'p2',
         card: Card(rank: Rank.four, suit: Suit.spades),
+      ),
+      const PlayCard(
+        playerId: 'p1',
+        card: Card(rank: Rank.four, suit: Suit.diamonds),
       ),
       const PlayCard(
         playerId: 'p1',
@@ -287,11 +287,11 @@ void main() {
         card: Card(rank: Rank.three, suit: Suit.spades),
       ),
       const PlayCard(
-        playerId: 'p1',
+        playerId: 'p2',
         card: Card(rank: Rank.ace, suit: Suit.diamonds),
       ),
       const PlayCard(
-        playerId: 'p2',
+        playerId: 'p1',
         card: Card(rank: Rank.king, suit: Suit.diamonds),
       ),
     ]) {
