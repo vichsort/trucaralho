@@ -148,11 +148,28 @@ void main(){
       Team(id:'t1',name:'Time 1',playerIds:['a','c']),
       Team(id:'t2',name:'Time 2',playerIds:['b','d']),
     ];
-    final hands={for(final p in players)p.id:const [
-      Card(rank:Rank.four,suit:Suit.diamonds),
-      Card(rank:Rank.five,suit:Suit.spades),
-      Card(rank:Rank.six,suit:Suit.hearts),
-    ]};
+    final hands={
+      'a': const [
+        Card(rank:Rank.four,suit:Suit.diamonds),
+        Card(rank:Rank.five,suit:Suit.spades),
+        Card(rank:Rank.six,suit:Suit.hearts),
+      ],
+      'b': const [
+        Card(rank:Rank.four,suit:Suit.spades),
+        Card(rank:Rank.five,suit:Suit.hearts),
+        Card(rank:Rank.six,suit:Suit.clubs),
+      ],
+      'c': const [
+        Card(rank:Rank.four,suit:Suit.hearts),
+        Card(rank:Rank.five,suit:Suit.clubs),
+        Card(rank:Rank.six,suit:Suit.diamonds),
+      ],
+      'd': const [
+        Card(rank:Rank.four,suit:Suit.clubs),
+        Card(rank:Rank.five,suit:Suit.diamonds),
+        Card(rank:Rank.six,suit:Suit.spades),
+      ],
+    };
     final state=const TrucoGame().newGame(
       players:players,teams:teams,deck:Deck(const []),
       vira:const Card(rank:Rank.seven,suit:Suit.diamonds),
