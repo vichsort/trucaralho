@@ -296,7 +296,9 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       a.playerId: [...hand]..remove(a.card),
     };
 
-    if (s.tricks.length >= 3) {
+    final completedTricks =
+        s.tricks.where((trick) => trick.cards.length == s.players.length).length;
+    if (completedTricks >= 3) {
       throw StateError('A mão não pode ter mais de três vazas.');
     }
 
