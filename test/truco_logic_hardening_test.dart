@@ -121,7 +121,6 @@ void _playToTerminal(
       reason: 'IA ausente para $playerId na fase ${state.phase.name}.',
     );
     state = game.apply(state, ai!.chooseAction(state, player));
-    }
   }
 
   fail('A partida excedeu o limite de $maxActions ações.');
