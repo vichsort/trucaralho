@@ -20,7 +20,7 @@ void main() {
   ];
 
   test('startGame cria uma partida nova com placar zerado e mão válida', () {
-    final state = const TrucoGame(random: Random(42)).startGame(
+    final state = TrucoGame(random: Random(42)).startGame(
       players: players,
       teams: teams,
       openingPlayerId: 'p1',
@@ -134,7 +134,7 @@ void main() {
       Team(id: 'y', name: 'Y', playerIds: ['b', 'd']),
     ];
 
-    final state = const TrucoGame(random: Random(42)).startGame(
+    final state = TrucoGame(random: Random(42)).startGame(
       players: fourPlayers,
       teams: fourTeams,
       openingPlayerId: 'a',
