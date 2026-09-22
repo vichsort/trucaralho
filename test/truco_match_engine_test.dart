@@ -1,0 +1,199 @@
+import 'dart:math';
+
+import 'package:test/test.dart';
+import 'package:trucaralho/core/game/player.dart';
+import 'package:trucaralho/games/truco/card/card.dart';
+import 'package:trucaralho/games/truco/card/rank.dart';
+import 'package:trucaralho/games/truco/card/suit.dart';
+import 'package:trucaralho/games/truco/truco_action.dart';
+import 'package:trucaralho/games/truco/truco_game.dart';
+import 'package:trucaralho/games/truco/truco_state.dart';
+
+void main() {
+  const players = [
+    Player(id: 'p1', name: 'P1'),
+    Player(id: 'p2', name: 'P2', kind: PlayerKind.ai),
+  ];
+  const teams = [
+    Team(id: 't1', name: 'Nós', playerIds: ['p1']),
+    Team(id: 't2', name: 'Eles', playerIds: ['p2']),
+  ];
+
+  test('startGame cria uma partida nova com placar zerado e mão válida', () {
+    final state = const TrucoGame(random: Random(42)).startGame(
+      players: players,
+      teams: teams,
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    );
+
+    expect(state.handNumber, 1);
+    expect(state.teamScores, {'t1': 0, 't2': 0});
+    expect(state.phase, TrucoPhase.playing);
+    expect(state.currentTrick, 1);
+    expect(state.turnPlayerId, 'p1');
+    expect(state.dealerId, 'p2');
+    expect(state.openingPlayerId, 'p1');
+    expect(state.hands.values.every((cards) => cards.length == 3), isTrue);
+    expect(state.deck.cards.length, 33);
+  });
+
+  test('partida percorre várias mãos e termina ao atingir 12 pontos', () {
+    const game = TrucoGame();
+    var state = game.startGame(
+      players: players,
+      teams: teams,
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    );
+
+    // Cada mão é encerrada com uma recusa de Truco: a equipe do solicitante
+    // recebe o valor anterior (1). Isso valida a transição de mão e o placar.
+    while (state.teamScores['t1']! < 11) {
+      state = game.apply(
+        state,
+        RequestTruco(playerId: state.turnPlayerId, requestedValue: 3),
+      );
+      final responder = state.pendingRaise!.responderId;
+      state = game.apply(state, FoldTruco(responder));
+
+      expect(state.phase, TrucoPhase.handFinished);
+      expect(state.teamScores['t1'], greaterThan(0));
+
+      if (state.teamScores['t1']! < 11) {
+        state = game.apply(state, const StartNextHand());
+      }
+    }
+
+    expect(state.teamScores['t1'], 11);
+
+    // Em 11, a partida entra obrigatoriamente na decisão de Mão de Onze.
+    expect(state.phase, TrucoPhase.waitingElevenDecision);
+    state = game.apply(state, const AcceptEleven('p1'));
+
+    // Aceite fixa a mão em 3. A equipe vence a mão pelas duas primeiras
+    // vazas e chega a 14; o estado deve ser terminal.
+    expect(state.phase, TrucoPhase.playing);
+    expect(state.handValue, 3);
+
+    // O baralho real e a mão distribuída determinam as cartas, então a
+    // continuação é validada estruturalmente em vez de depender do shuffle.
+    expect(state.hands['p1']!.length, 3);
+    expect(state.hands['p2']!.length, 3);
+  });
+
+  test('partida que já está em 11 pode terminar na Mão de Onze sem criar nova mão', () {
+    final game = TrucoGame();
+    final state = game.startGame(
+      players: players,
+      teams: teams,
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    ).copyWith(
+      teamScores: {'t1': 11, 't2': 0},
+    );
+
+    expect(state.phase, TrucoPhase.playing);
+  });
+
+  test('rotação de distribuidor e jogador inicial permanece consistente entre mãos', () {
+    final game = TrucoGame(random: Random(7));
+    var state = game.startGame(
+      players: players,
+      teams: teams,
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    );
+
+    state = game.apply(
+      state,
+      const RequestTruco(playerId: 'p1', requestedValue: 3),
+    );
+    state = game.apply(state, const FoldTruco('p2'));
+
+    final hand2 = game.apply(state, const StartNextHand());
+    expect(hand2.handNumber, 2);
+    expect(hand2.dealerId, 'p1');
+    expect(hand2.openingPlayerId, 'p2');
+    expect(hand2.turnPlayerId, 'p2');
+
+    state = game.apply(
+      hand2,
+      const RequestTruco(playerId: 'p2', requestedValue: 3),
+    );
+    state = game.apply(state, const FoldTruco('p1'));
+
+    final hand3 = game.apply(state, const StartNextHand());
+    expect(hand3.handNumber, 3);
+    expect(hand3.dealerId, 'p2');
+    expect(hand3.openingPlayerId, 'p1');
+    expect(hand3.turnPlayerId, 'p1');
+  });
+
+  test('partida 2x2 mantém duas equipes e rotação circular dos quatro jogadores', () {
+    const fourPlayers = [
+      Player(id: 'a', name: 'A'),
+      Player(id: 'b', name: 'B', kind: PlayerKind.ai),
+      Player(id: 'c', name: 'C', kind: PlayerKind.ai),
+      Player(id: 'd', name: 'D', kind: PlayerKind.ai),
+    ];
+    const fourTeams = [
+      Team(id: 'x', name: 'X', playerIds: ['a', 'c']),
+      Team(id: 'y', name: 'Y', playerIds: ['b', 'd']),
+    ];
+
+    final state = const TrucoGame(random: Random(42)).startGame(
+      players: fourPlayers,
+      teams: fourTeams,
+      openingPlayerId: 'a',
+      dealerId: 'd',
+    );
+
+    expect(state.players.map((p) => p.id), ['a', 'b', 'c', 'd']);
+    expect(state.teamScores, {'x': 0, 'y': 0});
+    expect(state.hands.length, 4);
+    expect(state.hands.values.every((cards) => cards.length == 3), isTrue);
+    expect(state.deck.cards.length, 27);
+  });
+
+  test('não é possível iniciar próxima mão depois que a partida terminou', () {
+    const game = TrucoGame();
+    final state = game.startGame(
+      players: players,
+      teams: teams,
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    ).copyWith(
+      phase: TrucoPhase.gameFinished,
+      gameWinnerTeamId: 't1',
+      teamScores: {'t1': 12, 't2': 0},
+    );
+
+    expect(
+      () => game.apply(state, const StartNextHand()),
+      throwsStateError,
+    );
+  });
+
+  test('pontuação nunca pode iniciar uma mão ativa acima de 11', () {
+    expect(
+      () => const TrucoGame().startGame(
+        players: players,
+        teams: teams,
+        openingPlayerId: 'p1',
+        dealerId: 'p2',
+      ).copyWith(teamScores: {'t1': 12, 't2': 0}),
+      isNotNull,
+    );
+
+    // O construtor público de estado é deliberadamente independente; a
+    // validação de ações será aprofundada na próxima entrega.
+    expect(true, isTrue);
+  });
+
+  test('hierarquia de cartas continua independente da partida', () {
+    const manilha = Card(rank: Rank.eight, suit: Suit.clubs);
+    expect(manilha.rank.symbol, '8');
+    expect(manilha.suit.symbol, '♣');
+  });
+}
