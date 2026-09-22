@@ -165,6 +165,7 @@ void main() {
     );
 
     final restored = factory(random: Random(999)).createSession(
+      config: TrucoGameConfig(),
       persistence: persistence(tempDirectory),
       persistenceKey: 'current',
     );
