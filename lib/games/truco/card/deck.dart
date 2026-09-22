@@ -15,12 +15,7 @@ final class Deck {
             Card(rank: rank, suit: suit),
       ]);
 
-  factory Deck.truco() => Deck([
-        for (final suit in Suit.values)
-          for (final rank in Rank.values)
-            if (rank != Rank.eight && rank != Rank.nine && rank != Rank.ten)
-              Card(rank: rank, suit: suit),
-      ]);
+  factory Deck.truco() => Deck.standard();
 
   Deck shuffled([Random? random]) {
     final result = [...cards];
