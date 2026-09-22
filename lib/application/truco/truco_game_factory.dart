@@ -16,8 +16,8 @@ final class TrucoGameSetup {
 
   TrucoGameSetup({
     required this.initialState,
-    required this.players,
-    required this.teams,
+    required List<Player> players,
+    required List<Team> teams,
     required Map<String, TrucoAI> ais,
   })  : ais = Map.unmodifiable(ais),
         players = List.unmodifiable(players),
