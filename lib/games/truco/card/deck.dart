@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'card.dart';
 import 'rank.dart';
 import 'suit.dart';
@@ -6,17 +7,25 @@ import 'suit.dart';
 final class Deck {
   final List<Card> cards;
 
-  const Deck(this.cards) : cards = List.unmodifiable(cards);
+  const Deck(this.cards);
 
   factory Deck.standard() => Deck([
         for (final suit in Suit.values)
-          for (final rank in Rank.values) Card(rank: rank, suit: suit),
+          for (final rank in Rank.values)
+            Card(rank: rank, suit: suit),
+      ]);
+
+  factory Deck.truco() => Deck([
+        for (final suit in Suit.values)
+          for (final rank in Rank.values)
+            if (rank != Rank.eight && rank != Rank.nine && rank != Rank.ten)
+              Card(rank: rank, suit: suit),
       ]);
 
   Deck shuffled([Random? random]) {
     final result = [...cards];
     result.shuffle(random ?? Random());
-    return Deck(result);
+    return Deck(List.unmodifiable(result));
   }
 
   (Deck remaining, List<Card> drawn) draw(int count) {
@@ -24,7 +33,7 @@ final class Deck {
       throw StateError('Quantidade inválida de cartas.');
     }
     return (
-      Deck(cards.sublist(count)),
+      Deck(List.unmodifiable(cards.sublist(count))),
       List.unmodifiable(cards.sublist(0, count)),
     );
   }
@@ -34,8 +43,12 @@ final class Deck {
       };
 
   factory Deck.fromJson(Map<String, dynamic> json) => Deck(
-        (json['cards'] as List)
-            .map((item) => Card.fromJson(Map<String, dynamic>.from(item as Map)))
-            .toList(),
+        List.unmodifiable(
+          (json['cards'] as List).map(
+            (item) => Card.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          ),
+        ),
       );
 }
