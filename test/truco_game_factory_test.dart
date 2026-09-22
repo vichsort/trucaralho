@@ -34,7 +34,7 @@ final class MemoryStore implements GameStateStore {
 void main() {
   test('cria partida 1v1 com humano, IA, equipes e mão inicial', () {
     final setup = TrucoGameFactory(random: Random(42)).create(
-      const TrucoGameConfig(),
+      TrucoGameConfig(),
     );
 
     expect(setup.players.length, 2);
@@ -108,10 +108,10 @@ void main() {
 
   test('Random injetado torna a mão inicial determinística', () {
     final first = TrucoGameFactory(random: Random(42)).create(
-      const TrucoGameConfig(),
+      TrucoGameConfig(),
     );
     final second = TrucoGameFactory(random: Random(42)).create(
-      const TrucoGameConfig(),
+      TrucoGameConfig(),
     );
 
     expect(first.initialState.toJson(), second.initialState.toJson());
@@ -163,7 +163,7 @@ void main() {
   test('partida criada pode ser entregue diretamente à TrucoSession', () async {
     final store = MemoryStore();
     final setup = TrucoGameFactory(random: Random(42)).create(
-      const TrucoGameConfig(),
+      TrucoGameConfig(),
     );
     final session = setup.createSession(
       persistence: GameStatePersistence<TrucoState>(
