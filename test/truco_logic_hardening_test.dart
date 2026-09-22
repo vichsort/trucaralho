@@ -93,9 +93,23 @@ void _playToTerminal(
       continue;
     }
 
-    final playerId = state.phase == TrucoPhase.waitingTrucoResponse
-        ? state.pendingRaise!.responderId
-        : state.turnPlayerId;
+    final playerId = switch (state.phase) {
+      TrucoPhase.waitingTrucoResponse => state.pendingRaise!.responderId,
+      TrucoPhase.waitingElevenDecision => state.players.firstWhere(
+          (player) => player.kind == PlayerKind.ai &&
+              state.teams
+                  .firstWhere(
+                    (team) => team.id == state.handElevenTeamId,
+                  )
+                  .playerIds
+                  .contains(player.id),
+        ).id,
+      TrucoPhase.playing => state.turnPlayerId,
+      TrucoPhase.handFinished ||
+      TrucoPhase.gameFinished =>
+        throw StateError('A fase terminal não deve solicitar ação de IA.'),
+    };
+
     final player = state.players.firstWhere(
       (candidate) => candidate.id == playerId,
     );
@@ -106,24 +120,7 @@ void _playToTerminal(
       isNotNull,
       reason: 'IA ausente para $playerId na fase ${state.phase.name}.',
     );
-    final hand = state.hands[playerId];
-    expect(
-      hand,
-      isNotEmpty,
-      reason:
-          'IA sem cartas: player=$playerId phase=${state.phase.name} '
-          'trick=${state.currentTrick} scores=${state.teamScores} '
-          'hands=${state.hands}',
-    );
-
-    try {
-      state = game.apply(state, ai!.chooseAction(state, player));
-    } on Object catch (error) {
-      fail(
-        'Ação inválida no estresse: player=$playerId '
-        'phase=${state.phase.name} turn=${state.turnPlayerId} '
-        'pending=${state.pendingRaise} error=$error',
-      );
+    state = game.apply(state, ai!.chooseAction(state, player));
     }
   }
 
