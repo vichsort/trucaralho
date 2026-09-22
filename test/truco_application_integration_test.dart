@@ -152,7 +152,7 @@ void main() {
 
   test('estado inicial criado pela factory é persistido em arquivo e restaurado', () async {
     final setup = factory(random: Random(42)).create(
-      TrucoGameConfig(),
+      TrucoGameConfig(dealerIndex: 1),
     );
 
     final original = setup.createSession(
