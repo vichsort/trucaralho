@@ -195,6 +195,60 @@ void main() {
     );
   });
 
+  test('cada aumento de Truco passa a vez para o novo respondente', () {
+    const game = TrucoGame();
+    final players = [
+      const Player(id: 'p1', name: 'P1'),
+      const Player(id: 'p2', name: 'P2', kind: PlayerKind.ai),
+    ];
+    final teams = [
+      const Team(id: 't1', name: 'T1', playerIds: ['p1']),
+      const Team(id: 't2', name: 'T2', playerIds: ['p2']),
+    ];
+    var state = game.newGame(
+      players: players,
+      teams: teams,
+      deck: const Deck([]),
+      vira: const Card(rank: Rank.seven, suit: Suit.diamonds),
+      hands: const {
+        'p1': [
+          Card(rank: Rank.three, suit: Suit.hearts),
+          Card(rank: Rank.two, suit: Suit.hearts),
+          Card(rank: Rank.ace, suit: Suit.hearts),
+        ],
+        'p2': [
+          Card(rank: Rank.four, suit: Suit.spades),
+          Card(rank: Rank.five, suit: Suit.spades),
+          Card(rank: Rank.six, suit: Suit.spades),
+        ],
+      },
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    );
+
+    state = game.apply(
+      state,
+      const RequestTruco(playerId: 'p1', requestedValue: 3),
+    );
+    state = game.apply(
+      state,
+      const RaiseTruco(playerId: 'p2', requestedValue: 6),
+    );
+
+    expect(state.pendingRaise!.requesterId, 'p2');
+    expect(state.pendingRaise!.responderId, 'p1');
+    expect(state.turnPlayerId, 'p1');
+
+    state = game.apply(
+      state,
+      const RaiseTruco(playerId: 'p1', requestedValue: 9),
+    );
+
+    expect(state.pendingRaise!.requesterId, 'p1');
+    expect(state.pendingRaise!.responderId, 'p2');
+    expect(state.turnPlayerId, 'p2');
+  });
+
   test('partidas 1v1 e 2v2 preservam invariantes de cartas até o fim', () {
     for (var seed = 1; seed <= 10; seed++) {
       const players = [
