@@ -13,17 +13,38 @@ final class ManualTrucoCounterState {
 
   ManualTrucoCounterState requestRaise() {
     if (finished) throw StateError('Contador finalizado.');
-    return copyWith(handValue: switch (handValue) {
-      1 => 3,
-      3 => 6,
-      6 => 9,
-      9 => 12,
-      _ => throw StateError('Valor máximo atingido.'),
-    });
+    return copyWith(
+      handValue: switch (handValue) {
+        1 => 3,
+        3 => 6,
+        6 => 9,
+        9 => 12,
+        _ => throw StateError('Valor máximo atingido.'),
+      },
+    );
+  }
+
+  ManualTrucoCounterState closeHand({required bool leftWinner}) {
+    if (finished) throw StateError('Contador finalizado.');
+
+    final points = handValue;
+    final nextLeft = leftWinner ? leftScore + points : leftScore;
+    final nextRight = leftWinner ? rightScore : rightScore + points;
+    final ended = nextLeft >= 12 || nextRight >= 12;
+
+    return copyWith(
+      leftScore: nextLeft,
+      rightScore: nextRight,
+      handValue: 1,
+      finished: ended,
+    );
   }
 
   ManualTrucoCounterState fold({required bool leftRequester}) {
-    if (finished || handValue == 1) throw StateError('Não há aumento pendente.');
+    if (finished || handValue == 1) {
+      throw StateError('Não há aumento pendente.');
+    }
+
     final points = switch (handValue) {
       3 => 1,
       6 => 3,
@@ -31,17 +52,27 @@ final class ManualTrucoCounterState {
       12 => 9,
       _ => throw StateError('Valor inválido.'),
     };
-    return add(leftRequester ? true : false, points).copyWith(handValue: 1);
+
+    return _addPoints(
+      leftRequester ? true : false,
+      points,
+    );
   }
 
   ManualTrucoCounterState add(bool left, int points) {
     if (finished) throw StateError('Contador finalizado.');
+    if (points <= 0) throw ArgumentError('A pontuação deve ser positiva.');
+    return _addPoints(left, points);
+  }
+
+  ManualTrucoCounterState _addPoints(bool left, int points) {
     final nextLeft = left ? leftScore + points : leftScore;
     final nextRight = left ? rightScore : rightScore + points;
     final ended = nextLeft >= 12 || nextRight >= 12;
+
     return copyWith(
-      leftScore: ended ? 0 : nextLeft,
-      rightScore: ended ? 0 : nextRight,
+      leftScore: nextLeft,
+      rightScore: nextRight,
       finished: ended,
       handValue: 1,
     );
