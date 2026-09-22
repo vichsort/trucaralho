@@ -329,6 +329,45 @@ void main() {
     expect(randomAction, isA<TrucoAction>());
   });
 
+  test('aceite de Truco não devolve a vez a jogador sem cartas', () {
+    final game = const TrucoGame();
+    final initial = game.newGame(
+      players: const [
+        Player(id: 'p1', name: 'P1'),
+        Player(id: 'p2', name: 'P2', kind: PlayerKind.ai),
+      ],
+      teams: const [
+        Team(id: 't1', name: 'T1', playerIds: ['p1']),
+        Team(id: 't2', name: 'T2', playerIds: ['p2']),
+      ],
+      deck: const Deck([]),
+      vira: const Card(rank: Rank.seven, suit: Suit.diamonds),
+      hands: const {
+        'p1': [],
+        'p2': [
+          Card(rank: Rank.three, suit: Suit.hearts),
+        ],
+      },
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    );
+
+    final pending = initial.copyWith(
+      phase: TrucoPhase.waitingTrucoResponse,
+      pendingRaise: const TrucoRaise(
+        requesterId: 'p1',
+        responderId: 'p2',
+        previousValue: 1,
+        requestedValue: 3,
+      ),
+    );
+
+    final accepted = game.apply(pending, const AcceptTruco('p2'));
+
+    expect(accepted.phase, TrucoPhase.playing);
+    expect(accepted.handValue, 3);
+    expect(accepted.turnPlayerId, 'p2');
+  });
   test('partidas 1v1 e 2v2 preservam invariantes de cartas até o fim', () {
     for (var seed = 1; seed <= 10; seed++) {
       const players = [
