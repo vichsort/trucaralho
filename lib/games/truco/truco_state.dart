@@ -112,9 +112,9 @@ final class TrucoState implements GameState {
         teams: List.unmodifiable(teams ?? this.teams),
         deck: deck ?? this.deck,
         vira: vira ?? this.vira,
-        hands: Map.unmodifiable(
+        hands: Map<String, List<Card>>.unmodifiable(
           (hands ?? this.hands).map(
-            (key, value) => MapEntry(key, List.unmodifiable(value)),
+            (key, value) => MapEntry(key, List<Card>.unmodifiable(value)),
           ),
         ),
         tricks: List.unmodifiable(tricks ?? this.tricks),
@@ -123,7 +123,7 @@ final class TrucoState implements GameState {
         openingPlayerId: openingPlayerId ?? this.openingPlayerId,
         dealerId: dealerId ?? this.dealerId,
         handNumber: handNumber ?? this.handNumber,
-        teamScores: Map.unmodifiable(teamScores ?? this.teamScores),
+        teamScores: Map<String, int>.unmodifiable(teamScores ?? this.teamScores),
         handValue: handValue ?? this.handValue,
         pendingRaise:
             clearPendingRaise ? null : (pendingRaise ?? this.pendingRaise),
