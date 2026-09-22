@@ -8,7 +8,7 @@ import 'truco_action.dart';
 import 'truco_rules.dart';
 import 'truco_state.dart';
 
-final class TrucoGame implements Game<TrucoState, TrucoAction> {
+final class TrucoGame implements Game<TrucoState,TrucoAction> {
   const TrucoGame();
 
   TrucoState startHand({
@@ -17,7 +17,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     required String openingPlayerId,
     Random? random,
   }) {
-    _validatePlayersAndTeams(players, teams);
+    _validatePlayersAndTeams(players,teams);
     var remaining=Deck.truco().shuffled(random??Random());
     final ordered=_orderedPlayers(players,openingPlayerId);
     final hands=<String,List<Card>>{};
@@ -55,6 +55,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
   TrucoState apply(TrucoState state,TrucoAction action)=>switch(action){
     PlayCard()=>_play(state,action),
     RequestTruco()=>_request(state,action),
+    RaiseTruco()=>_raise(state,action),
     AcceptTruco()=>_accept(state,action),
     FoldTruco()=>_fold(state,action),
   };
@@ -69,6 +70,21 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
         previousValue:s.handValue,requestedValue:a.requestedValue,
       ),
       phase:TrucoPhase.waitingTrucoResponse,
+    );
+  }
+
+  TrucoState _raise(TrucoState s,RaiseTruco a){
+    final r=s.pendingRaise;
+    if(s.phase!=TrucoPhase.waitingTrucoResponse||r==null)throw StateError('Não há pedido pendente.');
+    if(a.playerId!=r.responderId)throw StateError('Somente o respondente pode aumentar.');
+    if(r.requestedValue>=12)throw StateError('Doze só pode ser aceito ou recusado.');
+    final expected=TrucoRules.nextValue(r.requestedValue);
+    if(a.requestedValue!=expected)throw StateError('Aumento inválido.');
+    return s.copyWith(
+      pendingRaise:TrucoRaise(
+        requesterId:a.playerId,responderId:r.requesterId,
+        previousValue:r.requestedValue,requestedValue:a.requestedValue,
+      ),
     );
   }
 
@@ -100,10 +116,10 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       :s.tricks.last;
     final cards=[...current.cards,PlayedCard(playerId:a.playerId,card:a.card)];
     final completed=cards.length==s.players.length;
-    final tie=completed&&_isTie(s,cards);
+    final winner=completed?_trickWinner(s,cards):null;
     final updated=Trick(
       number:current.number,starterId:current.starterId,cards:cards,
-      winnerId:completed&&!tie?_trickWinner(s,cards):null,tied:tie,
+      winnerId:winner,tied:completed&&winner==null,
     );
     final tricks=[...s.tricks];
     if(tricks.isEmpty||tricks.last.cards.length==s.players.length)tricks.add(updated);
@@ -126,17 +142,21 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     );
   }
 
-  bool _isTie(TrucoState s,List<PlayedCard> cards){
-    final first=cards.first.card;
-    return cards.skip(1).every((p)=>TrucoRules.compare(first,p.card,s.vira)==0);
-  }
-
-  String _trickWinner(TrucoState s,List<PlayedCard> cards){
+  String? _trickWinner(TrucoState s,List<PlayedCard> cards){
     var best=cards.first;
+    var bestPlayers=<PlayedCard>[best];
     for(final play in cards.skip(1)){
-      if(TrucoRules.compare(best.card,play.card,s.vira)<0)best=play;
+      final cmp=TrucoRules.compare(best.card,play.card,s.vira);
+      if(cmp<0){
+        best=play;
+        bestPlayers=[play];
+      }else if(cmp==0){
+        bestPlayers=[...bestPlayers,play];
+      }
     }
-    return best.playerId;
+    final bestTeams=bestPlayers.map((p)=>_teamOf(s,p.playerId).id).toSet();
+    if(bestTeams.length>1)return null;
+    return bestPlayers.first.playerId;
   }
 
   String? _resolveHandWinner(TrucoState s,List<Trick> tricks){
@@ -155,8 +175,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       if(first!=null&&second==null)return first;
     }
     if(tricks.length==3){
-      final third=tricks[2].winnerId;
-      return third;
+      return tricks[2].winnerId;
     }
     return null;
   }
