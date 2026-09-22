@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:test/test.dart';
 import 'package:trucaralho/core/game/player.dart';
 import 'package:trucaralho/games/truco/card/card.dart';
+import 'package:trucaralho/games/truco/card/deck.dart';
 import 'package:trucaralho/games/truco/card/rank.dart';
 import 'package:trucaralho/games/truco/card/suit.dart';
 import 'package:trucaralho/games/truco/truco_action.dart';

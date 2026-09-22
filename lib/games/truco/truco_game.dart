@@ -91,7 +91,8 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     }
     final playerIds = players.map((p) => p.id).toSet();
     if (hands.length != players.length ||
-        hands.keys.toSet() != playerIds) {
+        !hands.keys.toSet().containsAll(playerIds) ||
+        !playerIds.containsAll(hands.keys)) {
       throw ArgumentError('O estado deve conter exatamente uma mão por jogador.');
     }
 
