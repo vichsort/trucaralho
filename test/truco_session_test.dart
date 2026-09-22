@@ -182,17 +182,24 @@ void main() {
 
   test('IA decide Mão de Onze automaticamente', () async {
     final s = session(
-      state: baseState(scores: const {'t1': 11, 't2': 8}),
+      state: baseState(scores: const {'t1': 8, 't2': 11}),
       ais: {
         'p2': FixedAI(
-          (state, player) => throw StateError('Não deveria ser chamada.'),
+          (state, player) => AcceptEleven(player.id),
         ),
       },
     );
 
-    // A equipe com 11 é humana neste cenário; a sessão não deve mover o estado.
-    expect(s.state.phase, TrucoPhase.waitingElevenDecision);
-    expect(s.history.events, isEmpty);
+    await s.dispatch(
+      const PlayCard(
+        playerId: 'p1',
+        card: Card(rank: Rank.three, suit: Suit.hearts),
+      ),
+    );
+
+    expect(s.state.phase, TrucoPhase.playing);
+    expect(s.state.handValue, 3);
+    expect(s.history.events, hasLength(1));
   });
 
   test('save e restore substituem o estado atual sem envolver Flutter', () async {
@@ -214,7 +221,44 @@ void main() {
     expect(restored.state.pendingRaise!.requestedValue, 3);
   });
 
-  test('save sem snapshot retorna false no restore', () async {
+  test('restore retoma automaticamente um turno de IA pendente', () async {
+    final store = MemoryStore();
+    final initial = baseState();
+    final source = session(state: initial, store: store);
+
+    await source.dispatch(
+      const RequestTruco(playerId: 'p1', requestedValue: 3),
+    );
+
+    // Persistimos manualmente o estado pendente para não deixar a IA responder antes do restore.
+    final pendingStore = MemoryStore();
+    await GameStatePersistence<TrucoState>(
+      serializer: serializer,
+      store: pendingStore,
+      game: 'truco_paulista',
+    ).save(
+      'current',
+      source.state,
+      savedAt: DateTime.utc(2026, 9, 22, 15),
+    );
+
+    final restored = session(
+      state: baseState(),
+      store: pendingStore,
+      ais: {
+        'p2': FixedAI(
+          (state, player) => AcceptTruco(player.id),
+        ),
+      },
+    );
+
+    expect(await restored.restore(), isTrue);
+    expect(restored.state.phase, TrucoPhase.playing);
+    expect(restored.state.handValue, 3);
+    expect(restored.state.pendingRaise, isNull);
+  });
+
+  test('save sem snapshot retorna false no restore
     final s = session(state: baseState());
     expect(await s.restore(), isFalse);
   });
