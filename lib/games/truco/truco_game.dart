@@ -52,6 +52,10 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       hands[player.id] = draw.drawn;
     }
 
+    if (hands.values.any((cards) => cards.length != 3)) {
+      throw StateError('A distribuição deve entregar exatamente 3 cartas por jogador.');
+    }
+
     final viraDraw = remaining.draw(1);
     return newGame(
       players: players,
@@ -87,9 +91,8 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     }
     final playerIds = players.map((p) => p.id).toSet();
     if (hands.length != players.length ||
-        hands.keys.toSet() != playerIds ||
-        hands.values.any((cards) => cards.length != 3)) {
-      throw ArgumentError('Cada jogador deve ter exatamente 3 cartas.');
+        hands.keys.toSet() != playerIds) {
+      throw ArgumentError('O estado deve conter exatamente uma mão por jogador.');
     }
 
     final allHandCards = hands.values.expand((cards) => cards).toList();
