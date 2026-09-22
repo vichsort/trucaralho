@@ -195,8 +195,8 @@ void main() {
     var s = stateWith(
       p1Cards: const [high, low, Card(rank: Rank.three, suit: Suit.clubs)],
       p2Cards: const [
-        low,
-        high,
+        lowSameRank,
+        Card(rank: Rank.three, suit: Suit.spades),
         Card(rank: Rank.four, suit: Suit.hearts),
       ],
     );
