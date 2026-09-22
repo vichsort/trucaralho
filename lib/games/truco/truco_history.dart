@@ -1,4 +1,5 @@
 import 'truco_action.dart';
+import 'card/card.dart';
 import 'truco_state.dart';
 import 'trick.dart';
 
@@ -34,7 +35,7 @@ final class TrucoHandHistory {
   final int handValue;
   final String? winnerTeamId;
   final String? dealerId;
-  final String? vira;
+  final Map<String, dynamic>? vira;
   final List<Trick> tricks;
 
   const TrucoHandHistory({
@@ -51,7 +52,7 @@ final class TrucoHandHistory {
         handValue: state.handValue,
         winnerTeamId: state.handWinnerTeamId,
         dealerId: state.dealerId,
-        vira: state.vira.toJson().toString(),
+        vira: state.vira.toJson(),
         tricks: state.tricks,
       );
 
@@ -107,6 +108,7 @@ final class TrucoHistoryRecorder {
   final List<String> teamIds;
   final List<TrucoHandHistory> _hands = [];
   final List<TrucoHistoryEvent> _events = [];
+  late TrucoState _lastState;
 
   TrucoHistoryRecorder({
     required TrucoState initialState,
@@ -117,7 +119,9 @@ final class TrucoHistoryRecorder {
         ),
         teamIds = List.unmodifiable(
           initialState.teams.map((t) => t.id),
-        );
+        ) {
+    _lastState = initialState;
+  }
 
   void record({
     required TrucoState before,
@@ -127,6 +131,7 @@ final class TrucoHistoryRecorder {
     _events.add(
       _eventFor(action: action, before: before, after: after),
     );
+    _lastState = after;
 
     if (after.phase == TrucoPhase.handFinished ||
         after.phase == TrucoPhase.gameFinished) {
@@ -137,14 +142,13 @@ final class TrucoHistoryRecorder {
   }
 
   TrucoMatchHistory build({DateTime? finishedAt}) {
-    final finalState = _hands.isEmpty ? null : _hands.last;
     return TrucoMatchHistory(
       startedAt: startedAt,
       finishedAt: finishedAt,
       playerIds: playerIds,
       teamIds: teamIds,
-      winnerTeamId: finalState?.winnerTeamId,
-      finalScore: const {},
+      winnerTeamId: _lastState.gameWinnerTeamId,
+      finalScore: Map.unmodifiable(_lastState.teamScores),
       hands: List.unmodifiable(_hands),
       events: List.unmodifiable(_events),
     );
