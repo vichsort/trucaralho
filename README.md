@@ -13,6 +13,7 @@ Primeira entrega: fundação de domínio e engine para Truco Paulista.
 - Contador manual independente.
 - IA aleatória e IA básica separadas do engine.
 - Histórico de partida modelado separadamente do estado corrente.
+- Persistência concreta local por arquivo, atrás da abstração `GameStateStore`.
 
 ## Validação
 
@@ -20,4 +21,4 @@ Primeira entrega: fundação de domínio e engine para Truco Paulista.
 dart test
 ```
 
-Nenhuma UI, Cubit/Bloc, persistência concreta ou Blackjack faz parte desta entrega.
+Nenhuma UI, Cubit/Bloc ou Blackjack faz parte desta entrega.
