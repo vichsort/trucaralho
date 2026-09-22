@@ -31,16 +31,16 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
 
     for (final player in ordered) {
       final draw = remaining.draw(3);
-      remaining = draw.$1;
-      hands[player.id] = draw.$2;
+      remaining = draw.remaining;
+      hands[player.id] = draw.drawn;
     }
 
     final viraDraw = remaining.draw(1);
     return newGame(
       players: players,
       teams: teams,
-      deck: viraDraw.$1,
-      vira: viraDraw.$2.single,
+      deck: viraDraw.remaining,
+      vira: viraDraw.drawn.single,
       hands: hands,
       openingPlayerId: openingPlayerId,
       dealerId: resolvedDealer,
