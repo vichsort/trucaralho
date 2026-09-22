@@ -23,7 +23,7 @@ final class Deck {
     return Deck(List.unmodifiable(result));
   }
 
-  (Deck remaining, List<Card> drawn) draw(int count) {
+  ({Deck remaining, List<Card> drawn}) draw(int count) {
     if (count < 0 || count > cards.length) {
       throw StateError('Quantidade inválida de cartas.');
     }
