@@ -11,6 +11,7 @@ Primeira entrega: fundação de domínio e engine para Truco Paulista.
 - Vazas, empates, mão, placar e negociação de Truco.
 - Estado serializável e restaurável.
 - Contador manual independente.
+- IA aleatória e IA básica separadas do engine.
 - Histórico de partida modelado separadamente do estado corrente.
 
 ## Validação
@@ -19,4 +20,4 @@ Primeira entrega: fundação de domínio e engine para Truco Paulista.
 dart test
 ```
 
-Nenhuma UI, Cubit/Bloc, persistência concreta, IA ou Blackjack faz parte desta entrega.
+Nenhuma UI, Cubit/Bloc, persistência concreta ou Blackjack faz parte desta entrega.
