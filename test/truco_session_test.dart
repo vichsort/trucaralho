@@ -190,12 +190,7 @@ void main() {
       },
     );
 
-    await s.dispatch(
-      const PlayCard(
-        playerId: 'p1',
-        card: Card(rank: Rank.three, suit: Suit.hearts),
-      ),
-    );
+    await s.resume();
 
     expect(s.state.phase, TrucoPhase.playing);
     expect(s.state.handValue, 3);
