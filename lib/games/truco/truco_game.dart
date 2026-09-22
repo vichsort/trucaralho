@@ -68,9 +68,20 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     if (!players.any((p) => p.id == resolvedDealer)) {
       throw ArgumentError('Distribuidor inexistente.');
     }
+    final playerIds = players.map((p) => p.id).toSet();
     if (hands.length != players.length ||
+        hands.keys.toSet() != playerIds ||
         hands.values.any((cards) => cards.length != 3)) {
-      throw ArgumentError('Cada jogador deve ter 3 cartas.');
+      throw ArgumentError('Cada jogador deve ter exatamente 3 cartas.');
+    }
+
+    final allHandCards = hands.values.expand((cards) => cards).toList();
+    if (allHandCards.toSet().length != allHandCards.length) {
+      throw ArgumentError('Uma carta não pode pertencer a dois jogadores.');
+    }
+
+    if (allHandCards.contains(vira) || allHandCards.any(deck.contains)) {
+      throw ArgumentError('Cartas da mão, vira e baralho devem ser exclusivas.');
     }
 
     final teamScores = {
@@ -263,6 +274,10 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       ...s.hands,
       a.playerId: [...hand]..remove(a.card),
     };
+
+    if (s.tricks.length >= 3) {
+      throw StateError('A mão não pode ter mais de três vazas.');
+    }
 
     final current = s.tricks.isEmpty ||
             s.tricks.last.cards.length == s.players.length
