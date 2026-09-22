@@ -258,7 +258,7 @@ void main() {
     expect(restored.state.pendingRaise, isNull);
   });
 
-  test('save sem snapshot retorna false no restore
+  test('save sem snapshot retorna false no restore', () async {
     final s = session(state: baseState());
     expect(await s.restore(), isFalse);
   });
