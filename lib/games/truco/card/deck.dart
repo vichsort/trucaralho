@@ -27,23 +27,37 @@ final class Deck {
     if (count < 0 || count > cards.length) {
       throw StateError('Quantidade inválida de cartas.');
     }
+
     return (
       remaining: Deck(List.unmodifiable(cards.sublist(count))),
       drawn: List.unmodifiable(cards.sublist(0, count)),
     );
   }
 
+  bool contains(Card card) => cards.contains(card);
+
   Map<String, dynamic> toJson() => {
         'cards': cards.map((card) => card.toJson()).toList(),
       };
 
-  factory Deck.fromJson(Map<String, dynamic> json) => Deck(
-        List.unmodifiable(
-          (json['cards'] as List).map(
-            (item) => Card.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            ),
+  factory Deck.fromJson(Map<String, dynamic> json) {
+    final rawCards = json['cards'];
+    if (rawCards is! List) {
+      throw FormatException('Baralho inválido.');
+    }
+
+    final cards = rawCards
+        .map(
+          (item) => Card.fromJson(
+            Map<String, dynamic>.from(item as Map),
           ),
-        ),
-      );
+        )
+        .toList();
+
+    if (cards.toSet().length != cards.length) {
+      throw FormatException('Baralho contém cartas duplicadas.');
+    }
+
+    return Deck(List.unmodifiable(cards));
+  }
 }
