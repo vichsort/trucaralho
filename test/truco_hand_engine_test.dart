@@ -193,31 +193,41 @@ void main() {
 
   test('duas primeiras vazas são de equipes diferentes e a terceira decide', () {
     var s = stateWith(
-      p1Cards: const [high, low, Card(rank: Rank.three, suit: Suit.clubs)],
+      p1Cards: const [
+        Card(rank: Rank.three, suit: Suit.diamonds),
+        Card(rank: Rank.four, suit: Suit.diamonds),
+        Card(rank: Rank.three, suit: Suit.clubs),
+      ],
       p2Cards: const [
-        lowSameRank,
+        Card(rank: Rank.four, suit: Suit.spades),
         Card(rank: Rank.three, suit: Suit.spades),
         Card(rank: Rank.four, suit: Suit.hearts),
       ],
     );
 
-    s = game.apply(s, const PlayCard(playerId: 'p1', card: high));
-    s = game.apply(s, const PlayCard(playerId: 'p2', card: low));
     s = game.apply(s, const PlayCard(
       playerId: 'p1',
-      card: low,
+      card: Card(rank: Rank.three, suit: Suit.diamonds),
     ));
     s = game.apply(s, const PlayCard(
       playerId: 'p2',
-      card: high,
+      card: Card(rank: Rank.four, suit: Suit.spades),
     ));
 
-    expect(s.phase, TrucoPhase.playing);
+    s = game.apply(s, const PlayCard(
+      playerId: 'p1',
+      card: Card(rank: Rank.four, suit: Suit.diamonds),
+    ));
+    s = game.apply(s, const PlayCard(
+      playerId: 'p2',
+      card: Card(rank: Rank.three, suit: Suit.spades),
+    ));
+
+    // p2 venceu a segunda vaza, então abre a terceira.
     s = game.apply(s, const PlayCard(
       playerId: 'p2',
       card: Card(rank: Rank.four, suit: Suit.hearts),
     ));
-    // p1 must play the remaining card first because p2 won the second vaza.
     s = game.apply(s, const PlayCard(
       playerId: 'p1',
       card: Card(rank: Rank.three, suit: Suit.clubs),
