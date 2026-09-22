@@ -16,12 +16,12 @@ final class TrucoGameSetup {
 
   TrucoGameSetup({
     required this.initialState,
-    required this.players,
-    required this.teams,
+    required List<Player> players,
+    required List<Team> teams,
     required Map<String, TrucoAI> ais,
-  })  : ais = Map.unmodifiable(ais),
-        players = List.unmodifiable(players),
-        teams = List.unmodifiable(teams);
+  })  : players = List.unmodifiable(players),
+        teams = List.unmodifiable(teams),
+        ais = Map.unmodifiable(ais);
 
   TrucoSession createSession({
     required GameStatePersistence<TrucoState> persistence,
