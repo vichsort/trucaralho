@@ -120,17 +120,7 @@ void _playToTerminal(
       isNotNull,
       reason: 'IA ausente para $playerId na fase ${state.phase.name}.',
     );
-    try {
-      state = game.apply(state, ai!.chooseAction(state, player));
-    } on Object catch (error) {
-      fail(
-        'Ação de estresse falhou: player=$playerId phase=${state.phase.name} '
-        'turn=${state.turnPlayerId} trick=${state.currentTrick} '
-        'hands=${state.hands} tricks=${state.tricks} '
-        'scores=${state.teamScores} pending=${state.pendingRaise} error=$error',
-      );
-    }
-  }
+    state = game.apply(state, ai!.chooseAction(state, player));
 
   fail('A partida excedeu o limite de $maxActions ações.');
 }
