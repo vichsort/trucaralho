@@ -1,6 +1,5 @@
 import 'card/card.dart';
 import 'card/rank.dart';
-import 'card/suit.dart';
 
 final class TrucoRules {
   static const values = [1, 3, 6, 9, 12];

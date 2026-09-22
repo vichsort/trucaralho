@@ -316,7 +316,7 @@ void main() {
         'game': 'truco_paulista',
         'schemaVersion': 1,
         'savedAt': 'invalid',
-        'state': {},
+        'state': <String, dynamic>{},
       }),
       throwsFormatException,
     );
