@@ -57,6 +57,7 @@ final class TrucoState implements GameState {
   final TrucoRaise? pendingRaise;
   final TrucoPhase phase;
   final String? handElevenTeamId;
+  final bool elevenHand;
   final bool blindHand;
   final String? handWinnerTeamId;
   final String? gameWinnerTeamId;
@@ -78,6 +79,7 @@ final class TrucoState implements GameState {
     required this.pendingRaise,
     required this.phase,
     required this.handElevenTeamId,
+    required this.elevenHand,
     required this.blindHand,
     required this.handWinnerTeamId,
     required this.gameWinnerTeamId,
@@ -102,6 +104,7 @@ final class TrucoState implements GameState {
     TrucoPhase? phase,
     String? handElevenTeamId,
     bool clearHandElevenTeam = false,
+    bool? elevenHand,
     bool? blindHand,
     String? handWinnerTeamId,
     bool clearHandWinner = false,
@@ -131,6 +134,7 @@ final class TrucoState implements GameState {
         handElevenTeamId: clearHandElevenTeam
             ? null
             : (handElevenTeamId ?? this.handElevenTeamId),
+        elevenHand: elevenHand ?? this.elevenHand,
         blindHand: blindHand ?? this.blindHand,
         handWinnerTeamId:
             clearHandWinner ? null : (handWinnerTeamId ?? this.handWinnerTeamId),
@@ -157,6 +161,7 @@ final class TrucoState implements GameState {
         'pendingRaise': pendingRaise?.toJson(),
         'phase': phase.name,
         'handElevenTeamId': handElevenTeamId,
+        'elevenHand': elevenHand,
         'blindHand': blindHand,
         'handWinnerTeamId': handWinnerTeamId,
         'gameWinnerTeamId': gameWinnerTeamId,
@@ -200,6 +205,7 @@ final class TrucoState implements GameState {
               ),
         phase: TrucoPhase.values.byName(json['phase'] as String),
         handElevenTeamId: json['handElevenTeamId'] as String?,
+        elevenHand: json['elevenHand'] as bool? ?? false,
         blindHand: json['blindHand'] as bool? ?? false,
         handWinnerTeamId: json['handWinnerTeamId'] as String?,
         gameWinnerTeamId: json['gameWinnerTeamId'] as String?,
