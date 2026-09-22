@@ -19,12 +19,15 @@ final class RandomTrucoAI implements TrucoAI {
   @override
   TrucoAction chooseAction(TrucoState state, Player player) {
     _validateAIPlayer(state, player);
-    final hand = _handOf(state, player.id);
 
     return switch (state.phase) {
       TrucoPhase.waitingElevenDecision => _chooseEleven(state, player.id),
       TrucoPhase.waitingTrucoResponse => _chooseRaiseResponse(state, player.id),
-      TrucoPhase.playing => _choosePlayingAction(state, player.id, hand),
+      TrucoPhase.playing => _choosePlayingAction(
+          state,
+          player.id,
+          _handOf(state, player.id),
+        ),
       TrucoPhase.handFinished ||
       TrucoPhase.gameFinished =>
         throw StateError('A IA não pode agir nesta fase.'),
@@ -102,13 +105,23 @@ final class BasicTrucoAI implements TrucoAI {
   @override
   TrucoAction chooseAction(TrucoState state, Player player) {
     _validateAIPlayer(state, player);
-    final hand = _handOf(state, player.id);
 
     return switch (state.phase) {
-      TrucoPhase.waitingElevenDecision => _chooseEleven(state, player.id, hand),
-      TrucoPhase.waitingTrucoResponse =>
-        _chooseRaiseResponse(state, player.id, hand),
-      TrucoPhase.playing => _choosePlayingAction(state, player.id, hand),
+      TrucoPhase.waitingElevenDecision => _chooseEleven(
+          state,
+          player.id,
+          _handOf(state, player.id),
+        ),
+      TrucoPhase.waitingTrucoResponse => _chooseRaiseResponse(
+          state,
+          player.id,
+          state.hands[player.id] ?? const [],
+        ),
+      TrucoPhase.playing => _choosePlayingAction(
+          state,
+          player.id,
+          _handOf(state, player.id),
+        ),
       TrucoPhase.handFinished ||
       TrucoPhase.gameFinished =>
         throw StateError('A IA não pode agir nesta fase.'),
