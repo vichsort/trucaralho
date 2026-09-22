@@ -281,7 +281,6 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
         previousValue: r.requestedValue,
         requestedValue: a.requestedValue,
       ),
-      turnPlayerId: r.requesterId,
     );
   }
 
