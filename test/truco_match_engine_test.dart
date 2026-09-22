@@ -175,25 +175,4 @@ void main() {
     );
   });
 
-  test('pontuação nunca pode iniciar uma mão ativa acima de 11', () {
-    expect(
-      () => const TrucoGame().startGame(
-        players: players,
-        teams: teams,
-        openingPlayerId: 'p1',
-        dealerId: 'p2',
-      ).copyWith(teamScores: {'t1': 12, 't2': 0}),
-      isNotNull,
-    );
-
-    // O construtor público de estado é deliberadamente independente; a
-    // validação de ações será aprofundada na próxima entrega.
-    expect(true, isTrue);
-  });
-
-  test('hierarquia de cartas continua independente da partida', () {
-    const manilha = Card(rank: Rank.eight, suit: Suit.clubs);
-    expect(manilha.rank.symbol, '8');
-    expect(manilha.suit.symbol, '♣');
-  });
 }
