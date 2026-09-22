@@ -57,6 +57,7 @@ final class TrucoSession {
 
     _validateAIConfiguration(restored, _ais);
     _state = restored;
+    await _runAITurns();
     return true;
   }
 
