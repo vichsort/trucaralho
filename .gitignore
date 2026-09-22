@@ -1,0 +1,8 @@
+.dart_tool/
+.packages
+.pub/
+build/
+coverage/
+.dart_tool/
+.idea/
+.vscode/
