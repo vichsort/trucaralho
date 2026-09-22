@@ -193,20 +193,20 @@ void main() {
         card: Card(rank: Rank.four, suit: Suit.diamonds),
       ),
       const PlayCard(
-        playerId: 'p1',
-        card: Card(rank: Rank.four, suit: Suit.hearts),
-      ),
-      const PlayCard(
         playerId: 'p2',
         card: Card(rank: Rank.four, suit: Suit.clubs),
       ),
       const PlayCard(
         playerId: 'p1',
-        card: Card(rank: Rank.three, suit: Suit.diamonds),
+        card: Card(rank: Rank.four, suit: Suit.hearts),
       ),
       const PlayCard(
         playerId: 'p2',
         card: Card(rank: Rank.two, suit: Suit.diamonds),
+      ),
+      const PlayCard(
+        playerId: 'p1',
+        card: Card(rank: Rank.three, suit: Suit.diamonds),
       ),
     ]) {
       s = game.apply(s, play);
@@ -334,12 +334,12 @@ void main() {
         card: Card(rank: Rank.three, suit: Suit.spades),
       ),
       const PlayCard(
-        playerId: 'p1',
-        card: Card(rank: Rank.four, suit: Suit.diamonds),
-      ),
-      const PlayCard(
         playerId: 'p2',
         card: Card(rank: Rank.four, suit: Suit.spades),
+      ),
+      const PlayCard(
+        playerId: 'p1',
+        card: Card(rank: Rank.four, suit: Suit.diamonds),
       ),
     ]) {
       s = game.apply(s, play);
