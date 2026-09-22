@@ -294,11 +294,15 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       throw StateError('Resposta inválida.');
     }
 
+    final nextTurn = s.hands[r.requesterId]?.isNotEmpty == true
+        ? r.requesterId
+        : _nextPlayerWithCards(s, r.requesterId);
+
     return s.copyWith(
       handValue: r.requestedValue,
       clearPendingRaise: true,
       phase: TrucoPhase.playing,
-      turnPlayerId: r.requesterId,
+      turnPlayerId: nextTurn,
     );
   }
 
@@ -323,7 +327,8 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
         _teamOf(s, r.requesterId).id == _teamOf(s, r.responderId).id) {
       throw StateError('Pedido de Truco pendente possui jogadores inválidos.');
     }
-    if (!TrucoRules.canRaise(r.previousValue) ||
+    if (r.previousValue < s.handValue ||
+        !TrucoRules.canRaise(r.previousValue) ||
         !TrucoRules.isValidValue(r.requestedValue) ||
         r.requestedValue != TrucoRules.nextValue(r.previousValue)) {
       throw StateError('Pedido de Truco pendente inválido.');
@@ -378,10 +383,11 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     }
 
     if (!completed) {
+      final nextTurn = _nextPlayerWithCards(s, a.playerId);
       return s.copyWith(
         hands: hands,
         tricks: tricks,
-        turnPlayerId: _nextPlayer(s, a.playerId),
+        turnPlayerId: nextTurn,
       );
     }
 
@@ -482,6 +488,22 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
 
   Team _teamOf(TrucoState s, String playerId) =>
       s.teams.firstWhere((t) => t.playerIds.contains(playerId));
+
+  String _nextPlayerWithCards(TrucoState s, String afterId) {
+    final index = s.players.indexWhere((player) => player.id == afterId);
+    if (index < 0) {
+      throw StateError('Jogador inexistente.');
+    }
+
+    for (var offset = 1; offset <= s.players.length; offset++) {
+      final player = s.players[(index + offset) % s.players.length];
+      if (s.hands[player.id]?.isNotEmpty == true) {
+        return player.id;
+      }
+    }
+
+    throw StateError('Não há jogador com cartas para continuar a mão.');
+  }
 
   String _nextPlayer(TrucoState s, String id) {
     return _nextPlayerFrom(s.players, id);

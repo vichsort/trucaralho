@@ -83,12 +83,21 @@ final class TrucoSession {
     }
 
     final team = _state.teams.firstWhere((team) => team.id == teamId);
+
+    for (final playerId in team.playerIds) {
+      final player = _state.players.firstWhere((player) => player.id == playerId);
+      if (player.kind == PlayerKind.human) {
+        return player.id;
+      }
+    }
+
     for (final playerId in team.playerIds) {
       final player = _state.players.firstWhere((player) => player.id == playerId);
       if (player.kind == PlayerKind.ai) {
         return player.id;
       }
     }
+
     return null;
   }
 
