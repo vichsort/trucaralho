@@ -383,10 +383,11 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     }
 
     if (!completed) {
+      final nextTurn = _nextPlayerWithCards(s, a.playerId);
       return s.copyWith(
         hands: hands,
         tricks: tricks,
-        turnPlayerId: _nextPlayer(s, a.playerId),
+        turnPlayerId: nextTurn,
       );
     }
 
