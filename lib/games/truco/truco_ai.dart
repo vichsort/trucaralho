@@ -123,7 +123,7 @@ final class BasicTrucoAI implements TrucoAI {
           TrucoRules.isManilha(card, state.vira) ||
           _nonManilhaStrength(card) >= 7,
     );
-    return strong.length.clamp(0, 3);
+    return strong.length.clamp(0, 3).toInt();
   }
 
   int _nonManilhaStrength(Card card) {
