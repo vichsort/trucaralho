@@ -40,8 +40,10 @@ final class TrucoSession {
 
   Future<void> dispatch(TrucoAction action) async {
     _apply(action);
-    await _runAITurns();
+    await resume();
   }
+
+  Future<void> resume() => _runAITurns();
 
   Future<void> save({DateTime? savedAt}) => persistence.save(
         persistenceKey,
@@ -57,7 +59,7 @@ final class TrucoSession {
 
     _validateAIConfiguration(restored, _ais);
     _state = restored;
-    await _runAITurns();
+    await resume();
     return true;
   }
 
