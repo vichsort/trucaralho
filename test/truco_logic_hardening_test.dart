@@ -343,16 +343,29 @@ void main() {
       deck: const Deck([]),
       vira: const Card(rank: Rank.seven, suit: Suit.diamonds),
       hands: const {
-        'p1': [],
+        'p1': [
+          Card(rank: Rank.four, suit: Suit.hearts),
+          Card(rank: Rank.five, suit: Suit.hearts),
+          Card(rank: Rank.ace, suit: Suit.hearts),
+        ],
         'p2': [
           Card(rank: Rank.three, suit: Suit.hearts),
+          Card(rank: Rank.six, suit: Suit.spades),
+          Card(rank: Rank.two, suit: Suit.spades),
         ],
       },
       openingPlayerId: 'p1',
       dealerId: 'p2',
     );
 
-    final pending = initial.copyWith(
+    final afterLastCard = initial.copyWith(
+      hands: {
+        'p1': const [],
+        'p2': initial.hands['p2']!,
+      },
+    );
+
+    final pending = afterLastCard.copyWith(
       phase: TrucoPhase.waitingTrucoResponse,
       pendingRaise: const TrucoRaise(
         requesterId: 'p1',
