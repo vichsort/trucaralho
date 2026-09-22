@@ -269,6 +269,61 @@ void main() {
     expect(state.pendingRaise!.responderId, 'p2');
   });
 
+  test('IA consegue responder a Truco mesmo sem cartas restantes', () {
+    const game = TrucoGame();
+    const players = [
+      Player(id: 'p1', name: 'P1'),
+      Player(id: 'p2', name: 'P2', kind: PlayerKind.ai),
+    ];
+    const teams = [
+      Team(id: 't1', name: 'T1', playerIds: ['p1']),
+      Team(id: 't2', name: 'T2', playerIds: ['p2']),
+    ];
+
+    final initial = game.newGame(
+      players: players,
+      teams: teams,
+      deck: const Deck([]),
+      vira: const Card(rank: Rank.seven, suit: Suit.diamonds),
+      hands: const {
+        'p1': [
+          Card(rank: Rank.three, suit: Suit.hearts),
+          Card(rank: Rank.two, suit: Suit.hearts),
+          Card(rank: Rank.ace, suit: Suit.hearts),
+        ],
+        'p2': [
+          Card(rank: Rank.four, suit: Suit.spades),
+          Card(rank: Rank.five, suit: Suit.spades),
+          Card(rank: Rank.six, suit: Suit.spades),
+        ],
+      },
+      openingPlayerId: 'p1',
+      dealerId: 'p2',
+    );
+
+    final pending = game.apply(
+      initial.copyWith(
+        hands: {
+          'p1': const [],
+          'p2': initial.hands['p2']!,
+        },
+      ),
+      const RequestTruco(playerId: 'p1', requestedValue: 3),
+    );
+
+    final basicAction = BasicTrucoAI(random: Random(1)).chooseAction(
+      pending,
+      players[1],
+    );
+    final randomAction = RandomTrucoAI(random: Random(1)).chooseAction(
+      pending,
+      players[1],
+    );
+
+    expect(basicAction, isA<TrucoAction>());
+    expect(randomAction, isA<TrucoAction>());
+  });
+
   test('partidas 1v1 e 2v2 preservam invariantes de cartas até o fim', () {
     for (var seed = 1; seed <= 10; seed++) {
       const players = [
