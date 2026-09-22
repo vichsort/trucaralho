@@ -76,8 +76,8 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     final teamScores = {
       for (final team in teams) team.id: scores?[team.id] ?? 0,
     };
-    if (teamScores.values.any((score) => score < 0 || score > 12)) {
-      throw ArgumentError('Placar inválido.');
+    if (teamScores.values.any((score) => score < 0 || score > 11)) {
+      throw ArgumentError('Placar de uma mão ativa deve estar entre 0 e 11.');
     }
 
     final atEleven = teams.where((t) => teamScores[t.id] == 11).toList();
