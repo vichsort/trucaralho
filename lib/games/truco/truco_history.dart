@@ -1,5 +1,4 @@
 import 'truco_action.dart';
-import 'card/card.dart';
 import 'truco_state.dart';
 import 'trick.dart';
 
