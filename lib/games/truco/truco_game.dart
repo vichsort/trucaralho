@@ -324,10 +324,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
         _teamOf(s, r.requesterId).id == _teamOf(s, r.responderId).id) {
       throw StateError('Pedido de Truco pendente possui jogadores inválidos.');
     }
-    if (s.turnPlayerId != r.responderId) {
-      throw StateError('O turno deve pertencer ao respondente do Truco.');
-    }
-    if (r.previousValue != s.handValue ||
+    if (r.previousValue < s.handValue ||
         !TrucoRules.canRaise(r.previousValue) ||
         !TrucoRules.isValidValue(r.requestedValue) ||
         r.requestedValue != TrucoRules.nextValue(r.previousValue)) {
