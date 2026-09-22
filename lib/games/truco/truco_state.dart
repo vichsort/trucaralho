@@ -1,4 +1,4 @@
-import '../../core/game/game_state.dart';
+import '../../core/game/game.dart';
 import '../../core/game/player.dart';
 import 'card/card.dart';
 import 'card/deck.dart';
