@@ -105,6 +105,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       pendingRaise: null,
       phase: phase,
       handElevenTeamId: atEleven.length == 1 ? atEleven.single.id : null,
+      elevenHand: atEleven.length == 1,
       blindHand: blindHand,
       handWinnerTeamId: null,
       gameWinnerTeamId: null,
@@ -135,6 +136,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     return s.copyWith(
       handValue: 3,
       phase: TrucoPhase.playing,
+      elevenHand: true,
       clearHandElevenTeam: true,
     );
   }
@@ -171,7 +173,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
 
   TrucoState _request(TrucoState s, RequestTruco a) {
     _playing(s);
-    if (s.blindHand || s.handElevenTeamId != null) {
+    if (s.blindHand || s.elevenHand) {
       throw StateError('Truco não é permitido nesta mão.');
     }
     _turn(s, a.playerId);
