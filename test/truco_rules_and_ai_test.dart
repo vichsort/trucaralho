@@ -185,27 +185,27 @@ void main() {
 
     for (final play in [
       const PlayCard(
-        playerId: 'p2',
+        playerId: 'p1',
         card: Card(rank: Rank.four, suit: Suit.spades),
       ),
       const PlayCard(
-        playerId: 'p1',
+        playerId: 'p2',
         card: Card(rank: Rank.four, suit: Suit.diamonds),
       ),
       const PlayCard(
-        playerId: 'p2',
+        playerId: 'p1',
         card: Card(rank: Rank.four, suit: Suit.clubs),
       ),
       const PlayCard(
-        playerId: 'p1',
+        playerId: 'p2',
         card: Card(rank: Rank.four, suit: Suit.hearts),
       ),
       const PlayCard(
-        playerId: 'p2',
+        playerId: 'p1',
         card: Card(rank: Rank.two, suit: Suit.diamonds),
       ),
       const PlayCard(
-        playerId: 'p1',
+        playerId: 'p2',
         card: Card(rank: Rank.three, suit: Suit.diamonds),
       ),
     ]) {
@@ -240,11 +240,11 @@ void main() {
         card: Card(rank: Rank.two, suit: Suit.diamonds),
       ),
       const PlayCard(
-        playerId: 'p2',
+        playerId: 'p1',
         card: Card(rank: Rank.four, suit: Suit.spades),
       ),
       const PlayCard(
-        playerId: 'p1',
+        playerId: 'p2',
         card: Card(rank: Rank.four, suit: Suit.diamonds),
       ),
     ]) {
