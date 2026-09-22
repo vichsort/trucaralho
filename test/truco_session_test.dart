@@ -10,7 +10,6 @@ import 'package:trucaralho/games/truco/card/rank.dart';
 import 'package:trucaralho/games/truco/card/suit.dart';
 import 'package:trucaralho/games/truco/truco_ai.dart';
 import 'package:trucaralho/games/truco/truco_action.dart';
-import 'package:trucaralho/games/truco/truco_game.dart';
 import 'package:trucaralho/games/truco/truco_state.dart';
 
 const p1 = Player(id: 'p1', name: 'Humano');
