@@ -14,6 +14,23 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
 
   const TrucoGame({this.random});
 
+  /// Starts a new match from zero points and deals its first hand.
+  TrucoState startGame({
+    required List<Player> players,
+    required List<Team> teams,
+    required String openingPlayerId,
+    Random? random,
+    String? dealerId,
+  }) =>
+      startHand(
+        players: players,
+        teams: teams,
+        openingPlayerId: openingPlayerId,
+        random: random,
+        dealerId: dealerId,
+        scores: const {},
+      );
+
   TrucoState startHand({
     required List<Player> players,
     required List<Team> teams,
