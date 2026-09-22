@@ -89,6 +89,20 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     if (!players.any((p) => p.id == resolvedDealer)) {
       throw ArgumentError('Distribuidor inexistente.');
     }
+    if (_nextPlayerFrom(players, resolvedDealer) != openingPlayerId) {
+      throw ArgumentError(
+        'O jogador inicial deve ser o próximo jogador após o distribuidor.',
+      );
+    }
+    if (handNumber < 1) {
+      throw ArgumentError('O número da mão deve ser positivo.');
+    }
+
+    final teamIds = teams.map((team) => team.id).toSet();
+    if (scores != null && scores.keys.any((id) => !teamIds.contains(id))) {
+      throw ArgumentError('O placar contém uma equipe inexistente.');
+    }
+
     final playerIds = players.map((p) => p.id).toSet();
     if (hands.length != players.length ||
         !hands.keys.toSet().containsAll(playerIds) ||
@@ -96,12 +110,24 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
       throw ArgumentError('O estado deve conter exatamente uma mão por jogador.');
     }
 
+    if (hands.values.any((cards) => cards.length != 3)) {
+      throw ArgumentError(
+        'Uma nova mão deve conter exatamente 3 cartas por jogador.',
+      );
+    }
+
+    if (deck.cards.toSet().length != deck.cards.length) {
+      throw ArgumentError('O baralho do estado contém cartas duplicadas.');
+    }
+
     final allHandCards = hands.values.expand((cards) => cards).toList();
     if (allHandCards.toSet().length != allHandCards.length) {
       throw ArgumentError('Uma carta não pode pertencer a dois jogadores.');
     }
 
-    if (allHandCards.contains(vira) || allHandCards.any(deck.contains)) {
+    if (allHandCards.contains(vira) ||
+        allHandCards.any(deck.contains) ||
+        deck.contains(vira)) {
       throw ArgumentError('Cartas da mão, vira e baralho devem ser exclusivas.');
     }
 
@@ -205,6 +231,10 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
 
   TrucoState _request(TrucoState s, RequestTruco a) {
     _playing(s);
+    _playerExists(s, a.playerId);
+    if (s.pendingRaise != null) {
+      throw StateError('Já existe um pedido de Truco pendente.');
+    }
     if (s.blindHand || s.elevenHand) {
       throw StateError('Truco não é permitido nesta mão.');
     }
@@ -231,6 +261,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     if (s.phase != TrucoPhase.waitingTrucoResponse || r == null) {
       throw StateError('Não há pedido pendente.');
     }
+    _validatePendingRaise(s, r);
     if (a.playerId != r.responderId) {
       throw StateError('Somente o respondente pode aumentar.');
     }
@@ -258,6 +289,7 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     if (s.phase != TrucoPhase.waitingTrucoResponse || r == null) {
       throw StateError('Não há pedido pendente.');
     }
+    _validatePendingRaise(s, r);
     if (a.playerId != r.responderId) {
       throw StateError('Resposta inválida.');
     }
@@ -275,11 +307,27 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     if (s.phase != TrucoPhase.waitingTrucoResponse || r == null) {
       throw StateError('Não há pedido pendente.');
     }
+    _validatePendingRaise(s, r);
     if (a.playerId != r.responderId) {
       throw StateError('Resposta inválida.');
     }
 
     return _finishHand(s, _teamOf(s, r.requesterId), r.previousValue);
+  }
+
+  void _validatePendingRaise(TrucoState s, TrucoRaise r) {
+    _playerExists(s, r.requesterId);
+    _playerExists(s, r.responderId);
+
+    if (r.requesterId == r.responderId ||
+        _teamOf(s, r.requesterId).id == _teamOf(s, r.responderId).id) {
+      throw StateError('Pedido de Truco pendente possui jogadores inválidos.');
+    }
+    if (!TrucoRules.canRaise(r.previousValue) ||
+        !TrucoRules.isValidValue(r.requestedValue) ||
+        r.requestedValue != TrucoRules.nextValue(r.previousValue)) {
+      throw StateError('Pedido de Truco pendente inválido.');
+    }
   }
 
   TrucoState _play(TrucoState s, PlayCard a) {
@@ -457,6 +505,12 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     return [...players.sublist(i), ...players.sublist(0, i)];
   }
 
+  void _playerExists(TrucoState s, String id) {
+    if (!s.players.any((player) => player.id == id)) {
+      throw StateError('Jogador inexistente.');
+    }
+  }
+
   void _turn(TrucoState s, String id) {
     if (s.turnPlayerId != id) {
       throw StateError('Não é a vez deste jogador.');
@@ -475,9 +529,11 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     }
 
     final ids = p.map((x) => x.id).toSet();
+    final teamIds = t.map((x) => x.id).toSet();
     final covered = t.expand((x) => x.playerIds).toList();
 
     if (ids.length != p.length ||
+        teamIds.length != t.length ||
         t.length != 2 ||
         covered.length != p.length ||
         covered.toSet().length != p.length ||
@@ -490,6 +546,23 @@ final class TrucoGame implements Game<TrucoState, TrucoAction> {
     final expected = p.length == 2 ? 1 : 2;
     if (t.any((x) => x.playerIds.length != expected)) {
       throw ArgumentError('Composição de times inválida.');
+    }
+
+    if (p.length == 4) {
+      final teamByPlayer = <String, String>{
+        for (final team in t)
+          for (final playerId in team.playerIds) playerId: team.id,
+      };
+
+      for (var i = 0; i < p.length; i++) {
+        final currentTeam = teamByPlayer[p[i].id];
+        final nextTeam = teamByPlayer[p[(i + 1) % p.length].id];
+        if (currentTeam == nextTeam) {
+          throw ArgumentError(
+            'Em 4 jogadores, os parceiros devem ficar em posições alternadas.',
+          );
+        }
+      }
     }
   }
 }
