@@ -79,20 +79,6 @@ void main() {
   test('manilha vence qualquer carta comum e respeita ordem dos naipes', () {
     var s = stateWith(
       p1Cards: const [
-        Card(rank: Rank.eight, suit: Suit.clubs),
-        high,
-        Card(rank: Rank.ace, suit: Suit.clubs),
-      ],
-      p2Cards: const [
-        Card(rank: Rank.queen, suit: Suit.diamonds),
-        lowSameRank,
-        Card(rank: Rank.ace, suit: Suit.hearts),
-      ],
-    );
-    // Rank 8 is intentionally unavailable in the real deck; this test must
-    // instead use a valid non-manilha rank.
-    s = stateWith(
-      p1Cards: const [
         Card(rank: Rank.queen, suit: Suit.clubs),
         high,
         Card(rank: Rank.ace, suit: Suit.clubs),
