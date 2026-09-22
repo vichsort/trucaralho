@@ -28,8 +28,8 @@ final class Deck {
       throw StateError('Quantidade inválida de cartas.');
     }
     return (
-      Deck(List.unmodifiable(cards.sublist(count))),
-      List.unmodifiable(cards.sublist(0, count)),
+      remaining: Deck(List.unmodifiable(cards.sublist(count))),
+      drawn: List.unmodifiable(cards.sublist(0, count)),
     );
   }
 
