@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:test/test.dart';
@@ -15,7 +14,6 @@ import 'package:trucaralho/games/truco/card/suit.dart';
 import 'package:trucaralho/games/truco/truco_action.dart';
 import 'package:trucaralho/games/truco/truco_ai.dart';
 import 'package:trucaralho/games/truco/truco_game.dart';
-import 'package:trucaralho/games/truco/truco_rules.dart';
 import 'package:trucaralho/games/truco/truco_state.dart';
 
 final serializer = JsonStateSerializer<TrucoState>(
