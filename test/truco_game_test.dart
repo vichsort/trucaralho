@@ -67,7 +67,7 @@ void main(){
     final pending=const TrucoRaise(
       requesterId:'p1',responderId:'p2',previousValue:3,requestedValue:6);
     final next=const TrucoGame().apply(
-      base(value:3).copyWith(pendingRaise:pending),const FoldTruco('p2'));
+      base(value:3).copyWith(pendingRaise:pending, phase:TrucoPhase.waitingTrucoResponse),const FoldTruco('p2'));
     expect(next.teamScores['t1'],3);
     expect(next.phase,TrucoPhase.handFinished);
   });
