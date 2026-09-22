@@ -4,6 +4,8 @@ import 'card/suit.dart';
 
 final class TrucoRules {
   static const values = [1, 3, 6, 9, 12];
+
+  /// Ordered from weakest to strongest.
   static const orderedRanks = [
     Rank.four,
     Rank.five,
@@ -27,18 +29,26 @@ final class TrucoRules {
   static bool isManilha(Card card, Card vira) =>
       card.rank == manilhaRank(vira);
 
+  /// Returns a negative number when [a] loses to [b], zero for a tie,
+  /// and a positive number when [a] beats [b].
   static int compare(Card a, Card b, Card vira) {
     final aManilha = isManilha(a, vira);
     final bManilha = isManilha(b, vira);
 
-    if (aManilha || bManilha) {
-      if (aManilha && !bManilha) return 1;
-      if (!aManilha && bManilha) return -1;
+    if (aManilha && !bManilha) return 1;
+    if (!aManilha && bManilha) return -1;
+
+    if (aManilha) {
       return a.suit.manilhaStrength.compareTo(b.suit.manilhaStrength);
     }
 
-    return orderedRanks.indexOf(a.rank).compareTo(orderedRanks.indexOf(b.rank));
+    return a.rank.strength.compareTo(b.rank.strength);
   }
+
+  static bool isValidValue(int value) => values.contains(value);
+
+  static bool canRaise(int current) =>
+      isValidValue(current) && current != values.last;
 
   static int nextValue(int current) {
     final index = values.indexOf(current);
